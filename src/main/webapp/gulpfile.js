@@ -3,13 +3,21 @@ var changed     = require('gulp-changed');
 var del         = require('del');
 var webserver   = require('gulp-webserver');
 var gutil       = require('gulp-util');
-var browserify  = require('gulp-browserify');
+var browserify  = require('browserify');
 var uglify      = require('gulp-uglify');
+var streamify   = require('gulp-streamify');
 var gulpif      = require('gulp-if');
+var watchify    = require('watchify');
+var source      = require('vinyl-source-stream');
+var reactify    = require('reactify');
+var notify      = require('gulp-notify');
+var sass        = require('gulp-ruby-sass');
+var autopref    = require('gulp-autoprefixer');
+var minifycss   = require('gulp-minify-css');
 
 
 var paths = {
-  bundle: 'app/js/app.js',
+  bundle: './app/js/app.js',
   scripts: ['app/js/**/*.js', 'app/js/**/*.jsx'],
   images: 'app/img/**/*',
   styles: 'app/styles/**/*.scss',
@@ -18,7 +26,16 @@ var paths = {
 };
 
 
-var real_build = false;
+var real_build = true;
+
+
+
+function handleError(task) {
+  return function(err) {
+    gutil.log(gutil.colors.red(err));
+    notify.onError(task + ' failed, check the logs..')(err);
+  };
+}
 
 
 gulp.task('clean', function(cb) {
@@ -51,29 +68,64 @@ gulp.task('static', [], function() {
     .pipe(gulp.dest(dest));
 }); 
 
+
 /*
- * static ressources
+ * scripts
  */
 gulp.task('scripts', function() {
-  return gulp.src(paths.bundle, {read: false})
-    .pipe(browserify({
-      insertGlobals : false,
-      transform: ['reactify'],
-      extensions: ['.jsx'],
-      debug: !real_build,
-    }))
-    .pipe(gulpif(real_build, uglify({
-      mangle: {
-        except: ['require', 'export', '$super']
-      }
-    })))
-    .pipe(gulp.dest(paths.dist + '/js'));
+  var bundler, rebundle;
+  bundler = browserify({
+    entries: paths.bundle,
+    basedir: __dirname, 
+    extensions: ['.jsx'],
+    insertGlobals : false,
+    debug: !real_build, 
+    cache: {}, // required for watchify
+    packageCache: {}, // required for watchify
+    fullPaths: !real_build // required to be true only for watchify
+  });
+  if(!real_build) {
+    bundler = watchify(bundler) 
+  }
+ 
+  bundler.transform(reactify);
+ 
+  rebundle = function() {
+    var stream = bundler.bundle();
+    stream.on('error', handleError('Browserify'));
+    stream = stream.pipe(source('app.js'))
+
+    // uglify
+    if(real_build) {
+      stream.pipe(streamify(uglify({
+        mangle: {
+          except: ['require', 'export', '$super']
+        }        
+      })));
+    }
+    return stream.pipe(gulp.dest(paths.dist + '/js'));
+  };
+ 
+  bundler.on('update', rebundle);
+  return rebundle();
 });
+
+/*
+ * styles
+ */
+gulp.task('styles', function() {
+  return gulp.src(paths.styles)
+    .pipe(sass({ style: 'expanded' }))
+    .pipe(gulpif(real_build, autopref('last 2 version')))
+    .pipe(gulpif(real_build, minifycss()))
+    .pipe(gulp.dest(paths.dist + '/css'));
+});
+
 
 /*
  * server
  */
-gulp.task('serve', ['build', 'watch'], function() {
+gulp.task('serve', ['prepare_serve', 'build', 'watch'], function() {
   gulp.src(paths.dist)
     .pipe(webserver({
       host: "0.0.0.0",
@@ -91,23 +143,23 @@ gulp.task('serve', ['build', 'watch'], function() {
 gulp.task('watch', function() {
   gulp.watch(paths.staticFiles, ['static']);
   gulp.watch(paths.images, ['images']);
-  gulp.watch(paths.scripts, ['scripts']);
+  gulp.watch(paths.styles, ['styles']);
 });
 
 
 /*
  * build
  */
-gulp.task('build', ['scripts', 'images', 'static']); 
+gulp.task('build', ['scripts', 'styles', 'images', 'static']); 
 
 /*
  * build
  */
-gulp.task('prepare_build', [], function() {
-  real_build = true;
+gulp.task('prepare_serve', [], function() {
+  real_build = false;
 }); 
 
 /*
  * default
  */
-gulp.task('default', ['prepare_build','build']);
+gulp.task('default', ['build']);

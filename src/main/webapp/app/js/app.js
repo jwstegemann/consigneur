@@ -8,7 +8,7 @@ var app = React.renderComponent(
   Comment({
     key: "12345",
     author: "ich",
-    text: "Dies ist ein Test"
+    text: "Dies ist ein Test1"
   }),
   document.getElementById('container')
 );
