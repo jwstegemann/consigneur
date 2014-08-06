@@ -1,16 +1,24 @@
-var gulp      = require('gulp');
-var changed   = require('gulp-changed');
-var del       = require('del');
-var webserver = require('gulp-webserver');
+var gulp        = require('gulp');
+var changed     = require('gulp-changed');
+var del         = require('del');
+var webserver   = require('gulp-webserver');
+var gutil       = require('gulp-util');
+var browserify  = require('gulp-browserify');
+var uglify      = require('gulp-uglify');
+var gulpif      = require('gulp-if');
 
 
 var paths = {
-  scripts: ['app/js/**/*.js'],
+  bundle: 'app/js/app.js',
+  scripts: ['app/js/**/*.js', 'app/js/**/*.jsx'],
   images: 'app/img/**/*',
   styles: 'app/styles/**/*.scss',
   dist: 'dist',
   staticFiles: ['app/index.html', 'app/favicon.ico']
 };
+
+
+var real_build = false;
 
 
 gulp.task('clean', function(cb) {
@@ -43,11 +51,29 @@ gulp.task('static', [], function() {
     .pipe(gulp.dest(dest));
 }); 
 
+/*
+ * static ressources
+ */
+gulp.task('scripts', function() {
+  return gulp.src(paths.bundle, {read: false})
+    .pipe(browserify({
+      insertGlobals : false,
+      transform: ['reactify'],
+      extensions: ['.jsx'],
+      debug: !real_build,
+    }))
+    .pipe(gulpif(real_build, uglify({
+      mangle: {
+        except: ['require', 'export', '$super']
+      }
+    })))
+    .pipe(gulp.dest(paths.dist + '/js'));
+});
 
 /*
  * server
  */
-gulp.task('serve', ['watch'], function() {
+gulp.task('serve', ['build', 'watch'], function() {
   gulp.src(paths.dist)
     .pipe(webserver({
       host: "0.0.0.0",
@@ -65,16 +91,23 @@ gulp.task('serve', ['watch'], function() {
 gulp.task('watch', function() {
   gulp.watch(paths.staticFiles, ['static']);
   gulp.watch(paths.images, ['images']);
+  gulp.watch(paths.scripts, ['scripts']);
 });
 
 
 /*
  * build
  */
-gulp.task('build', ['clean', 'images', 'static']); 
+gulp.task('build', ['scripts', 'images', 'static']); 
 
+/*
+ * build
+ */
+gulp.task('prepare_build', [], function() {
+  real_build = true;
+}); 
 
 /*
  * default
  */
-gulp.task('default', ['build']);
+gulp.task('default', ['prepare_build','build']);
