@@ -1,7 +1,7 @@
 var gulp        = require('gulp');
 var changed     = require('gulp-changed');
 var del         = require('del');
-var webserver   = require('gulp-webserver');
+var webserver   = require('./utils/gulp-webserver/src/index');
 var gutil       = require('gulp-util');
 var browserify  = require('browserify');
 var uglify      = require('gulp-uglify');
@@ -132,7 +132,39 @@ gulp.task('serve', ['prepare_serve', 'build', 'watch'], function() {
       port: 9000,
       livereload: true,
       directoryListing: false,
-      fallback: 'index.html'
+      fallback: 'index.html',
+      proxies: [{
+        source: '/story',
+        target: 'http://localhost:8080/story'
+      },
+      {
+        source: '/query',
+        target: 'http://localhost:8080/query'
+      },
+      {
+        source: '/user',
+        target: 'http://localhost:8080/user'
+      },
+      {
+        source: '/attachment',
+        target: 'http://localhost:8080/attachment'
+      },
+      {
+        source: '/graph',
+        target: 'http://localhost:8080/graph'
+      },
+      {
+        source: '/share',
+        target: 'http://localhost:8080/share'
+      },
+      {
+        source: '/star',
+        target: 'http://localhost:8080/star'
+      },
+      {
+        source: '/due',
+        target: 'http://localhost:8080/due'
+      }]
     }));
 });
 
