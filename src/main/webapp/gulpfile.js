@@ -14,15 +14,20 @@ var notify      = require('gulp-notify');
 var sass        = require('gulp-ruby-sass');
 var autopref    = require('gulp-autoprefixer');
 var minifycss   = require('gulp-minify-css');
+var open        = require("gulp-open");
+var plumber     = require("gulp-plumber")
+var svgSymbols  = require("gulp-svg-symbols")
 
 
 var paths = {
   bundle: './app/js/app.js',
   scripts: ['app/js/**/*.js', 'app/js/**/*.jsx'],
-  images: 'app/img/**/*',
+  imageFiles: 'app/img/**/*',
   styles: 'app/styles/**/*.scss',
   dist: 'dist',
-  staticFiles: ['app/index.html', 'app/favicon.ico']
+  staticFiles: ['app/index.html', 'app/favicon.ico'],
+  indexHtml: "http://localhost:9000/index.html",
+  icons: 'app/icons/*'
 };
 
 
@@ -50,7 +55,7 @@ gulp.task('clean', function(cb) {
 gulp.task('images', [], function() {
   var dest = paths.dist + '/img';
 
-  return gulp.src(paths.images)
+  return gulp.src(paths.imageFiles)
     .pipe(changed(dest))
     // Pass in options to the task
 //    .pipe(imagemin({optimizationLevel: 5}))
@@ -121,18 +126,38 @@ gulp.task('styles', function() {
     .pipe(gulp.dest(paths.dist + '/css'));
 });
 
+/*
+ * icons
+ */
+gulp.task('icons', function() {
+  return gulp.src(paths.icons)
+    .pipe(plumber())
+    .pipe(svgSymbols({
+      svgId: "IconSvg-%f",
+      className: ".IconSvg-%f",
+//      fontSize: 512 // svg icons default font-size,
+      css: false
+    }))
+    .pipe(gulp.dest(paths.dist + '/icons'));
+});
+
 
 /*
  * server
  */
 gulp.task('serve', ['prepare_serve', 'build', 'watch'], function() {
+  var options = {
+    url: paths.indexHtml,
+    app: "google-chrome"
+  };
+
   gulp.src(paths.dist)
     .pipe(webserver({
       host: "0.0.0.0",
       port: 9000,
       livereload: true,
-      directoryListing: false,
-      fallback: 'index.html',
+      directoryListing: true,
+//      fallback: 'index.html',
       proxies: [{
         source: '/story',
         target: 'http://localhost:8080/story'
@@ -166,23 +191,26 @@ gulp.task('serve', ['prepare_serve', 'build', 'watch'], function() {
         target: 'http://localhost:8080/due'
       }]
     }));
-});
 
+    gulp.src("./app/index.html")
+    .pipe(open("", options));
+});
 
 /*
  * Rerun the task when a file changes
  */
 gulp.task('watch', function() {
   gulp.watch(paths.staticFiles, ['static']);
-  gulp.watch(paths.images, ['images']);
+  gulp.watch(paths.imageFiles, ['images']);
   gulp.watch(paths.styles, ['styles']);
+  gulp.watch(paths.icons, ['icons']);
 });
 
 
 /*
  * build
  */
-gulp.task('build', ['scripts', 'styles', 'images', 'static']); 
+gulp.task('build', ['scripts', 'styles', 'images', 'icons', 'static']); 
 
 /*
  * build

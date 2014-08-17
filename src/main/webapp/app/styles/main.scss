@@ -1,5 +1,28 @@
-$blue: #0000ff;
+/*
+ * material design imports
+ */
+@import 'typography';
+@import 'colors';
 
-#container {
-  background: $blue;
+
+/*
+ * component imports
+ */
+@import 'appBar';
+
+
+/*
+ * default
+ */
+
+:root {
+  icon-color: black;
+}
+
+p {
+  @extends '.body1';
+}
+
+body {
+  background: $color-grey-200;
 }

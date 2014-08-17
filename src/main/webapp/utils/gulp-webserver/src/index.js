@@ -77,12 +77,14 @@ module.exports = function(options) {
   /*
    * proxies
    */
-  for (var i = 0, len = proxies.length; i < len; i++) {
-    var p = proxies[i];
-    app.use(p.source, proxy(url.parse(p.target)));
+  if (proxies) {
+    for (var i = 0, len = proxies.length; i < len; i++) {
+      var p = proxies[i];
+      app.use(p.source, proxy(url.parse(p.target)));
 
-    gutil.log('...proxying ', gutil.colors.green(p.source), '-> ', gutil.colors.green(p.target));
+      gutil.log('...proxying ', gutil.colors.green(p.source), '-> ', gutil.colors.green(p.target));
 
+    }
   }
 
   var lrServer;

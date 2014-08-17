@@ -1,0 +1,108 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500);
+
+
+.base-font {
+  font-family: 'Roboto', sans-serif;
+}
+
+.light-font {
+  font-weight: 300;
+}
+
+.regular-font {
+  font-weight: 400;
+}
+
+.medium-font {
+  font-weight: 500;
+}
+
+
+/*
+ * Standard Styles
+ */
+
+.display4 {
+  @extend .base-font;
+  @extend .light-font;
+  font-size: 112px;
+  color: rgba(0,0,0,0.54);
+}
+
+.display3 {
+  @extend .base-font;  
+  @extend .regular-font;
+  font-size: 56px;
+  color: rgba(0,0,0,0.54);
+}
+
+.display2 {
+  @extend .base-font; 
+  @extend .regular-font;
+  font-size: 45px;
+  color: rgba(0,0,0,0.54);
+}
+
+.display1 {
+  @extend .base-font;  
+  @extend .regular-font;
+  font-size: 34px;
+  color: rgba(0,0,0,0.54);
+}
+
+.headline {
+  @extend .base-font;
+  @extend .regular-font;
+  font-size: 24px;
+  color: rgba(0,0,0,0.87);
+}
+
+.title {
+  @extend .base-font;
+  @extend .medium-font;  
+  font-size: 20px;
+  color: rgba(0,0,0,0.87);
+}
+
+.subhead {
+  @extend .base-font;
+  @extend .regular-font;  
+  font-size: 16px;
+  color: rgba(0,0,0,0.87);
+}
+
+.body2 {
+  @extend .base-font;
+  @extend .medium-font;
+  font-size: 14px;
+  color: rgba(0,0,0,0.87);
+}
+
+.body1 {
+  @extend .base-font;
+  @extend .regular-font;
+  font-size: 14px;
+  color: rgba(0,0,0,0.87);
+}
+
+.caption {
+  @extend .base-font;
+  @extend .regular-font;
+  font-size: 12px;
+  color: rgba(0,0,0,0.54);
+}
+
+.menu {
+  @extend .base-font;
+  @extend .medium-font;
+  font-size: 14px;
+  color: rgba(0,0,0,0.87);
+}
+
+.button {
+  @extend .base-font;
+  @extend .medium-font;
+  font-size: 14px;
+  color: rgba(0,0,0,0.87);
+  text-transform: uppercase;
+}
