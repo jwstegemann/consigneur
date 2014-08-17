@@ -1,6 +1,29 @@
+@import 'typography';
+@import 'colors';
+
+
 .card {
+  position: absolute;
+
   box-shadow: $shadow-z1;
 
   border-radius: 2px;
-  border: 1px solid grey;
+
+  background: white;
+
+  margin: 8px;
+  padding: 16px;
+
+  width: 760px;
 }
+
+
+.card-title {
+  @extend .headline;
+  color: $color-indigo;
+  margin-bottom: 16px;
+}
+
+.card-content {
+  @extend .body1;
+} 

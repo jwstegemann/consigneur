@@ -120,6 +120,7 @@ gulp.task('scripts', function() {
  */
 gulp.task('styles', function() {
   return gulp.src(paths.styles)
+    .pipe(plumber())
     .pipe(sass({ style: 'expanded' }))
     .pipe(gulpif(real_build, autopref('last 2 version')))
     .pipe(gulpif(real_build, minifycss()))

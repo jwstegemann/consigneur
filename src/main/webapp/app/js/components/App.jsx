@@ -4,13 +4,17 @@
 var React = require('react');
 var Icon = require('./Icon');
 
+var AppBar = require('./AppBar');
+
+
 module.exports = React.createClass({
   render: function() {
     return (
-      <div>
-      <div className="story">Bin in App</div>
-
-      <this.props.activeRouteHandler/>
+      <div className="app">
+        <AppBar />
+        <div className="view">
+          <this.props.activeRouteHandler/>
+        </div>
       </div>
     );
   }

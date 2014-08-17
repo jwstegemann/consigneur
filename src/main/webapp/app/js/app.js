@@ -15,7 +15,7 @@ var Story = require('./components/Story');
 var routes = (
   <Routes location="hash">
     <Route name="app" path="/" handler={App}>
-      <Route name="story" path="/story" handler={Story}/>
+      <Route name="story" path="/story/:storyId" handler={Story}/>
     </Route>
   </Routes>
 );

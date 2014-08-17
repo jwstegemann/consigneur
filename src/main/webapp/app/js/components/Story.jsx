@@ -3,11 +3,15 @@
 
 var React = require('react');
 var Icon = require('./Icon');
+var Card = require('./Card');
 
 module.exports = React.createClass({
   render: function() {
     return (
-      <div className="story">Bin in Story</div>
+      <Card />
+      
     );
+
+    // <div className="story">Bin in Story {this.props.params.storyId} ...</div>
   }
 });

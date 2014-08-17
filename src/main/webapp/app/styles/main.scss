@@ -21,9 +21,26 @@
 }
 
 p {
-  @extends '.body1';
+  @extend .body1;
 }
 
 body {
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  
+}
+
+.view {
+  position: absolute;
+  top: 56px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   background: $color-grey-200;
+
+  overflow: hidden;
 }
